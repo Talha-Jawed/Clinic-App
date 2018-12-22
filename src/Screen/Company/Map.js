@@ -8,8 +8,8 @@ import { Constants, Location, Permissions } from 'expo';
 
 
 export default class ClinicLocation extends React.Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
             markers: '',
             ready: false,
@@ -17,10 +17,19 @@ export default class ClinicLocation extends React.Component {
             error: null,
             location: null,
             errorMessage: null,
-            get: false
+            get: false,
+            ClinicName: this.props.navigation.state.params.Name,
+            Since: this.props.navigation.state.params.Since,
+            OpenTime: this.props.navigation.state.params.openTime,
+            CloseTIme: this.props.navigation.state.params.closeTime,
+            Certificates: this.props.navigation.state.params.Certificates
         }
     }
     componentDidMount() {
+        console.log(this.props.navigation.state.params.Certificates);
+        console.log(this.props.Since);
+
+
         if (Platform.OS === 'android' && !Constants.isDevice) {
             this.setState({
                 errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
@@ -44,18 +53,18 @@ export default class ClinicLocation extends React.Component {
             get: true
         });
     };
-   
+
 
     render() {
-        const { positionx, positiony, coordinate, where, location, get } = this.state
-        // console.log('where****', where.lat);
+        const { positionx, positiony, ClinicName, Certificates, OpenTime, CloseTIme, Since, where, location, get } = this.state
+        console.log('****', ClinicName , Since , OpenTime , CloseTIme , Certificates);
         // console.log('loca*****', location);
 
         return (
             <View style={styles.container}>
                 {get === true &&
                     this.MapComponent()
-                    
+
                 }
                 {/* <Button
                     title='location'
@@ -89,11 +98,11 @@ export default class ClinicLocation extends React.Component {
                         longitude: where.lng,
                     }}
                     onDragEnd={e => this.setState({ positionx: e.nativeEvent.position.x, positiony: e.nativeEvent.position.y, coordinate: e.nativeEvent.coordinate })}
-                    // anchor={{ x: positionx, y: positiony }}
-                    // centerOffset={{
-                    //     x: positionx,
-                    //     y: positiony
-                    // }}
+                // anchor={{ x: positionx, y: positiony }}
+                // centerOffset={{
+                //     x: positionx,
+                //     y: positiony
+                // }}
                 //   coordinate={{ latitude, longitude }}
                 />
 
