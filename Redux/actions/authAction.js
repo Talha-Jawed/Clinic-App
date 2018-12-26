@@ -71,8 +71,10 @@ export function fb_Action(type, token) {
                 }
                 firebase.database().ref('/UserData/' + currentUID).update(obj);
                 dispatch(
-                    { type: actionTypes.USERNAME, payload: success.additionalUserInfo.profile.name },
                     { type: actionTypes.UID, payload: success.user.uid }
+                )
+                dispatch(
+                    { type: actionTypes.USERNAME, payload: success.additionalUserInfo.profile.name },
                 )
             })
                 .catch((error) => {
@@ -80,10 +82,26 @@ export function fb_Action(type, token) {
                     alert(error)
                 })
             console.log("fb login");
-            
+
         } else {
             type === 'cancel'
         }
 
+    }
+}
+
+// submit CLinic Data
+
+export function _submit(UID, ClinicName, Since, OpenTime, CloseTIme, Certificates, where) {
+    return dispatch => {
+        // dispatch(
+        //     { type: actionTypes.USERNAME, payload: success.additionalUserInfo.profile.name },
+        //     { type: actionTypes.UID, payload: success.user.uid }
+        // )
+        var currentUID = UID
+        var obj = {
+            ClinicName, Since, OpenTime, CloseTIme, Certificates , where
+        }
+        firebase.database().ref('/UserData/' + currentUID).update(obj);
     }
 }

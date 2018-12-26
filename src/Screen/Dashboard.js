@@ -13,10 +13,10 @@ class Home extends React.Component {
             Mobile: ''
         };
     }
-    componentDidMount() {
-        console.log('dashboard', this.props);
+    // componentDidMount() {
+    //     console.log('dashboard', this.props);
 
-    }
+    // }
     componentWillReceiveProps(props) {
         if (props.name) {
             console.log(USERNAME, 'user ****')
@@ -36,7 +36,7 @@ class Home extends React.Component {
         console.log('user UID =>', this.props.UID)
 
         const { language, catagory, Mobile } = this.state
-       
+
 
         return (
             <View  >
@@ -66,7 +66,7 @@ class Home extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    
+
     val: {
         // borderColor: 'gray', borderWidth: 2,
 

@@ -1,13 +1,15 @@
 import React from 'react';
-import { View, ScrollView, Text, TextInput, StyleSheet, Button, Platform, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, TextInput, StyleSheet, Button, Platform, TouchableOpacity, Alert } from 'react-native';
 import { Marker } from 'react-native-maps';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { geodesy, distance, latitude, longitude, elevation, geolocation, geodistance, geojson, geospatial, lbs, location } from 'geolib'
 import { Constants, Location, Permissions } from 'expo';
+import { connect } from 'react-redux'
+import { _submit } from '../../../Redux/actions/authAction'
+import { StackActions, NavigationActions } from 'react-navigation';
 
 
-
-export default class ClinicLocation extends React.Component {
+class ClinicLocation extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -22,14 +24,12 @@ export default class ClinicLocation extends React.Component {
             Since: this.props.navigation.state.params.Since,
             OpenTime: this.props.navigation.state.params.openTime,
             CloseTIme: this.props.navigation.state.params.closeTime,
-            Certificates: this.props.navigation.state.params.Certificates
+            Certificates: this.props.navigation.state.params.Certificates,
+            UID: ''
         }
     }
     componentDidMount() {
-        console.log(this.props.navigation.state.params.Certificates);
-        console.log(this.props.Since);
-
-
+        this.setState({ UID: this.props.UID })
         if (Platform.OS === 'android' && !Constants.isDevice) {
             this.setState({
                 errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
@@ -55,41 +55,53 @@ export default class ClinicLocation extends React.Component {
     };
 
 
+    Submit() {
+        const { UID, ClinicName, Since, OpenTime, CloseTIme, Certificates, where } = this.state
+        console.log('submit***');
+        Alert.alert('Registerd')
+        this.props.submit(UID, ClinicName, Since, OpenTime, CloseTIme, Certificates, where)
+        const resetAction = StackActions.reset({
+            index: 0,
+            actions: [
+                NavigationActions.navigate({ routeName: 'Company' }),
+            ]
+        })
+        this.props.navigation.dispatch(resetAction)
+    }
+
     render() {
-        const { positionx, positiony, ClinicName, Certificates, OpenTime, CloseTIme, Since, where, location, get } = this.state
-        console.log('****', ClinicName , Since , OpenTime , CloseTIme , Certificates);
-        // console.log('loca*****', location);
-
+        const { ClinicName, Certificates, OpenTime, CloseTIme, Since, where, UID, get } = this.state
+        console.log('****', UID, ClinicName, Since, OpenTime, CloseTIme, Certificates, where);
         return (
-            <View style={styles.container}>
-                {get === true &&
-                    this.MapComponent()
+            <View>
+                <View style={styles.container}>
 
-                }
-                {/* <Button
-                    title='location'
-                    onPress={() => this._getLocationAsync()}
-                /> */}
+                    {get === true &&
+                        this.MapComponent()
+                    }
+                </View>
+                <View style={{ marginTop: 400 }}>
+                    <TouchableOpacity style={styles.buton} onPress={() => this.Submit()}>
+                        <Text style={styles.ButtonText}>Register</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-
         );
     }
 
     MapComponent() {
-        const { positionx, positiony, coordinate, where, location, get } = this.state
-
+        const { coordinate_lat, coordinate_lng, positionx, positiony, coordinate, where, location, get } = this.state
+        console.log('cordinates***', where);
         return (
             <MapView
                 provider={PROVIDER_GOOGLE} // remove if not using Google Maps
                 style={styles.map}
-
                 region={{
                     latitude: where.lat,
                     longitude: where.lng,
                     latitudeDelta: 0.015,
                     longitudeDelta: 0.0121,
                 }}
-
             >
                 <MapView.Marker
                     draggable
@@ -97,15 +109,10 @@ export default class ClinicLocation extends React.Component {
                         latitude: where.lat,
                         longitude: where.lng,
                     }}
-                    onDragEnd={e => this.setState({ positionx: e.nativeEvent.position.x, positiony: e.nativeEvent.position.y, coordinate: e.nativeEvent.coordinate })}
-                // anchor={{ x: positionx, y: positiony }}
-                // centerOffset={{
-                //     x: positionx,
-                //     y: positiony
-                // }}
-                //   coordinate={{ latitude, longitude }}
+                    onDragEnd={e => this.setState({
+                        where: { lat: e.nativeEvent.coordinate.latitude, lng: e.nativeEvent.coordinate.longitude }
+                    })}
                 />
-
 
             </MapView>
         )
@@ -122,4 +129,36 @@ const styles = StyleSheet.create({
     map: {
         ...StyleSheet.absoluteFillObject,
     },
+    buton: {
+        alignItems: 'center',
+        backgroundColor: '#2980b9',
+        justifyContent: 'space-around',
+        // width: 80,
+        height: 40
+        // justifyContent: 'space-between',
+    },
+    ButtonText: {
+        fontWeight: 'bold',
+        color: "#ffff",
+        // alignItems:'center'
+        fontSize: 20
+    },
+
 });
+
+function mapStateToProps(states) {
+    return ({
+        UID: states.authReducers.UID
+    })
+}
+
+function mapDispatchToProps(dispatch) {
+    return ({
+        submit: (UID, ClinicName, Since, OpenTime, CloseTIme, Certificates, where) => {
+            dispatch(_submit(UID, ClinicName, Since, OpenTime, CloseTIme, Certificates, where));
+
+        },
+    })
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ClinicLocation);
