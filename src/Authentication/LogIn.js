@@ -4,7 +4,7 @@ import { black } from 'ansi-colors';
 import firebase from '../Config/Firebase';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux'
-import { Action, fb_Action } from '../../Redux/actions/authAction'
+import { Action, fb_Action, current_User } from '../../Redux/actions/authAction'
 
 
 class LogIn extends React.Component {
@@ -28,7 +28,8 @@ class LogIn extends React.Component {
                     ]
                 })
                 this.props.navigation.dispatch(resetAction)
-
+                const currentUser = user
+                this.props.user(currentUser)
             }
         })
     }
@@ -169,9 +170,11 @@ function mapDispatchToProps(dispatch) {
             dispatch(Action(Email, Password));
 
         },
-
         fb_User: (type, token) => {
             dispatch(fb_Action(type, token))
+        },
+        user: (currentUser) => {
+            dispatch(current_User(currentUser))
         }
     })
 }

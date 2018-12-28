@@ -7,16 +7,11 @@ export function userAction(FirstName, LastName, Mobile, Email, Password) {
     return dispatch => {
         firebase.auth().createUserWithEmailAndPassword(Email, Password)
             .then((success) => {
-
-
                 console.log('Success*****', success.user)
                 console.log('token*****', success.user.accessToken)
 
                 var currentUserUid = success.user.uid;
-                dispatch(
-                    { type: actionTypes.USERNAME, payload: FirstName + ' ' + LastName },
-                    { type: actionTypes.UID, payload: success.user.uid }
-                )
+
                 let obj = {
                     Name: FirstName + ' ' + LastName,
                     UID: success.user.uid,
@@ -42,10 +37,6 @@ export function Action(Email, Password) {
                 alert('Success')
                 console.log(success);
 
-                dispatch(
-                    { type: actionTypes.USERNAME, payload: success.user.displayName },
-                    { type: actionTypes.UID, payload: success.user.uid }
-                )
             })
             .catch((error) => {
                 alert('Invalid Email & Password')
@@ -70,12 +61,7 @@ export function fb_Action(type, token) {
                     Token: token
                 }
                 firebase.database().ref('/UserData/' + currentUID).update(obj);
-                dispatch(
-                    { type: actionTypes.UID, payload: success.user.uid }
-                )
-                dispatch(
-                    { type: actionTypes.USERNAME, payload: success.additionalUserInfo.profile.name },
-                )
+
             })
                 .catch((error) => {
                     console.log(error, '********');
@@ -90,18 +76,43 @@ export function fb_Action(type, token) {
     }
 }
 
-// submit CLinic Data
 
+// current User
+export function current_User(currentUser) {
+    return dispatch => {
+        const UID = currentUser.uid
+        dispatch(
+            { type: actionTypes.UID, payload: UID }
+        )
+        firebase.database().ref('/UserData/' + UID).on('value', snapShot => {
+            const UserData = snapShot.val()
+            dispatch(
+                { type: actionTypes.CLINICDATA, payload: UserData }
+            )
+        })
+    }
+}
+
+
+// submit CLinic Data
 export function _submit(UID, ClinicName, Since, OpenTime, CloseTIme, Certificates, where) {
     return dispatch => {
-        // dispatch(
-        //     { type: actionTypes.USERNAME, payload: success.additionalUserInfo.profile.name },
-        //     { type: actionTypes.UID, payload: success.user.uid }
-        // )
         var currentUID = UID
         var obj = {
-            ClinicName, Since, OpenTime, CloseTIme, Certificates , where
+            ClinicName, Since, OpenTime, CloseTIme, Certificates, where
         }
         firebase.database().ref('/UserData/' + currentUID).update(obj);
+    }
+}
+
+// Token no
+export function Token_No(Count, UID) {
+    return dispatch => {
+        var currentUID = UID;
+        var obj = {
+            Count
+        }
+        firebase.database().ref('/UserData/' + currentUID).update(obj);
+
     }
 }

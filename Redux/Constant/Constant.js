@@ -1,6 +1,7 @@
 const actionTypes = {
     USERNAME: "USERNAME",
-    UID: "UID"
+    UID: "UID",
+    CLINICDATA: "CLINICDATA"
 }
 
 export default actionTypes;

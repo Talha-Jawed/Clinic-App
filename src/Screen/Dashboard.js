@@ -8,9 +8,7 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            language: '',
-            catagory: '',
-            Mobile: ''
+          
         };
     }
     // componentDidMount() {
@@ -34,6 +32,7 @@ class Home extends React.Component {
     render() {
         console.log('user name hare =>', this.props.name)
         console.log('user UID =>', this.props.UID)
+        console.log('clinic Data =>', this.props.ClinicData);
 
         const { language, catagory, Mobile } = this.state
 
@@ -93,13 +92,13 @@ const styles = StyleSheet.create({
         marginTop: 150,
     }
 
-
 });
 
 function mapStateToProps(states) {
     return ({
         name: states.authReducers.USERNAME,
-        UID: states.authReducers.UID
+        UID: states.authReducers.UID,
+        ClinicData: states.authReducers.CLINICDATA
     })
 }
 
